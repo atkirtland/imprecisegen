@@ -57,21 +57,24 @@ function partition_by_condition(condition, array)
   return true_items, false_items
 end
 
-# a version that takes in a single probability and uses it to specify a region around each above vertex
-@gen function guess(possibilities, filter_condition, prob::Float64, op::Function)
-  @assert (op == (==)) || (op == (>=)) "Operation not supported yet!"
+@gen function guess(possibilities, filter_condition, probs, op::Function)
+  @assert op in [==,>=,<=] "Operation not supported yet!"
+  if typeof(probs) == Float64
+    # Interpret this as specifying a region around each above vertex
+    probs = Dict{Any, Float64}(() => probs)
+  end
   above, below = partition_by_condition(filter_condition, possibilities)
+  if op == (<=)
+    above, below = below, above
+  end
   prod = collect(product(above, below)) |> vec
-  if op == (>=)
+  if op in [>=, <=]
     prod = vcat(prod, [(option, option) for option in above])
   end
   z = {:z} ~ knight(prod)
+  prob = get(probs, (z[1], z[2]), get(probs, z[1], get(probs, (), 0.0)))
   b = {:b} ~ bernoulli(prob)
-  if b
-    return z[1]
-  else
-    return z[2]
-  end
+  return b ? z[1] : z[2]
 end
 
 function binary_tuples(n)

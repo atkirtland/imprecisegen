@@ -28,7 +28,7 @@ end
 end
 
 @gen function pa8090()
-  guess1 ~ guess(['r', 'g', 'b'], x -> x == 'r' || x == 'g', 0.9, >=)
+  guess1 ~ guess(['r', 'g', 'b'], x -> x == 'r', Dict(('r','g') => 0.9,('r','b') => 0.8), >=)
   return guess1
 end
 
@@ -40,8 +40,10 @@ end
   guess3 ~ guess(possibilities, x -> x[3], 0.92, ==)
 end
 
-titles = ["P(A)=0.9", "P(A)>=0.9", "2 of three"]
-ps = [plot(framestyle=:none, aspect_ratio=1, xlims=(-0.1, 1.1), ylims=(-0.1, sqrt(3) / 2 + 0.1), title=titles[i]) for i in 1:3]
+
+
+titles = ["P(A)=0.9", "P(A)>=0.9", "P(A) 80/90","2 of three"]
+ps = [plot(framestyle=:none, aspect_ratio=1, xlims=(-0.1, 1.1), ylims=(-0.1, sqrt(3) / 2 + 0.1), title=titles[i]) for i in 1:4]
 
 # P(A)=0.9
 
@@ -91,6 +93,30 @@ dicts = enumerate_outcomes_dict(trace_dict, log_norm_weights)
 pts = dict_to_points(dicts, ['r', 'g', 'b'])
 plot_ternary(ps[2], pts)
 
+# P(A) 80/90
+
+model = pa8090
+model_args = ()
+observations = EmptyChoiceMap()
+sample_choices = [
+  ((:guess1 => :b), [false, true]),
+]
+sample_choice_vol_iter = choice_vol_grid(sample_choices...)
+knight_choices = [
+  ((:guess1 => :z), [('r','r'), ('r', 'g'), ('r', 'b')]),
+]
+knight_choice_vol_iter = choice_vol_grid(knight_choices...)
+trace_dict, log_norm_weights, lml_est = imprecise_enumerative_inference(
+  model,
+  model_args,
+  observations,
+  knight_choice_vol_iter,
+  sample_choice_vol_iter,
+)
+dicts = enumerate_outcomes_dict(trace_dict, log_norm_weights)
+pts = dict_to_points(dicts, ['r', 'g', 'b'])
+plot_ternary(ps[3], pts)
+
 # 2 of 3
 
 model = twoofthree
@@ -117,7 +143,7 @@ trace_dict, log_norm_weights, lml_est = imprecise_enumerative_inference(
 )
 dicts = enumerate_outcomes_dict(trace_dict, log_norm_weights)
 pts = dict_to_points(dicts, ['r', 'g', 'b'])
-plot_ternary(ps[2], pts)
+plot_ternary(ps[4], pts)
 
 # # TODO compute lower and upper probabilities
 
