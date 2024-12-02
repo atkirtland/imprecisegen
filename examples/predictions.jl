@@ -28,9 +28,14 @@ end
 end
 
 @gen function pa8090()
-  guess1 ~ guess(['r', 'g', 'b'], x -> x == 'r', Dict(('r','g') => 0.9,('r','b') => 0.8), >=)
+  guess1 ~ guess(['r', 'g', 'b'], x -> x == 'r', Dict(('r','g') => 0.9,('r','b') => 0.8), <=)
   return guess1
 end
+
+# @gen function pa8090()
+#   guess1 ~ guess(['r', 'g', 'b'], x -> x != 'r', Dict(('g','r') => 0.9, ('b','r') => 0.8), >=)
+#   return guess1
+# end
 
 # This is to test expanding the semantics of conditioning on a credal set
 @gen function twoofthree()
@@ -103,7 +108,8 @@ sample_choices = [
 ]
 sample_choice_vol_iter = choice_vol_grid(sample_choices...)
 knight_choices = [
-  ((:guess1 => :z), [('r','r'), ('r', 'g'), ('r', 'b')]),
+  ((:guess1 => :z), [('g','g'), ('b', 'b'), ('g','r'), ('b', 'r')]),
+  # ((:guess1 => :z), [('r','r'), ('r', 'g'), ('r', 'b')]),
 ]
 knight_choice_vol_iter = choice_vol_grid(knight_choices...)
 trace_dict, log_norm_weights, lml_est = imprecise_enumerative_inference(
@@ -145,7 +151,7 @@ dicts = enumerate_outcomes_dict(trace_dict, log_norm_weights)
 pts = dict_to_points(dicts, ['r', 'g', 'b'])
 plot_ternary(ps[4], pts)
 
-# # TODO compute lower and upper probabilities
+# TODO compute lower and upper probabilities
 
 # combine
 

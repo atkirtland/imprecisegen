@@ -57,8 +57,9 @@ function partition_by_condition(condition, array)
   return true_items, false_items
 end
 
+# probs must either be a Float64 or a Dict with key something true under the filter_condition
 @gen function guess(possibilities, filter_condition, probs, op::Function)
-  @assert op in [==,>=,<=] "Operation not supported yet!"
+  @assert op in [==,>=,<=] "Operation not supported!"
   if typeof(probs) == Float64
     # Interpret this as specifying a region around each above vertex
     probs = Dict{Any, Float64}(() => probs)
@@ -66,13 +67,15 @@ end
   above, below = partition_by_condition(filter_condition, possibilities)
   if op == (<=)
     above, below = below, above
+    probs = Dict((k[2], k[1]) => v for (k, v) in probs)
   end
   prod = collect(product(above, below)) |> vec
   if op in [>=, <=]
     prod = vcat(prod, [(option, option) for option in above])
   end
   z = {:z} ~ knight(prod)
-  prob = get(probs, (z[1], z[2]), get(probs, z[1], get(probs, (), 0.0)))
+  # I'm not certain 1.0 is the "right" choice of the default probability (if such a choice exists), but this makes the 80/90 example with both >= and <= give a nontrivial answer
+  prob = get(probs, (z[1], z[2]), get(probs, z[1], get(probs, (), 1.0)))
   b = {:b} ~ bernoulli(prob)
   return b ? z[1] : z[2]
 end
