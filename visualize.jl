@@ -33,6 +33,25 @@ function plot_ternary(p, pts_3d::Vector{Any})
   pts_x = [v[1] for v in pts_2d]
   pts_y = [v[2] for v in pts_2d]
 
+  function plot_convex_region!(p, points_2d)
+    num_points = length(points_2d)
+
+    if num_points == 1
+      x_coords = [points_2d[1][1]]
+      y_coords = [points_2d[1][2]]
+      plot!(p, x_coords, y_coords, lw=2, color=:gray, label="")
+    elseif num_points == 2
+      x_coords = [points_2d[1][1], points_2d[2][1]]
+      y_coords = [points_2d[1][2], points_2d[2][2]]
+      plot!(p, x_coords, y_coords, lw=2, color=:gray, label="")
+    elseif num_points >= 3
+      hull = VPolygon([vcat(p...) for p in points_2d])
+      plot!(p, hull, alpha=0.3, color=:gray)
+    end
+  end
+
+  plot_convex_region!(p, pts_2d)
+
   scatter!(p,
     pts_x, pts_y,
     label="",
@@ -62,24 +81,5 @@ function plot_ternary(p, pts_3d::Vector{Any})
     end
     annotate!(p, x, y, text(lbl, 12, color, halign=align[1], valign=align[2]))
   end
-
-  function plot_convex_region!(p, points_2d)
-    num_points = length(points_2d)
-
-    if num_points == 1
-      x_coords = [points_2d[1][1]]
-      y_coords = [points_2d[1][2]]
-      plot!(p, x_coords, y_coords, lw=2, color=:gray, label="")
-    elseif num_points == 2
-      x_coords = [points_2d[1][1], points_2d[2][1]]
-      y_coords = [points_2d[1][2], points_2d[2][2]]
-      plot!(p, x_coords, y_coords, lw=2, color=:gray, label="")
-    elseif num_points >= 3
-      hull = VPolygon([vcat(p...) for p in points_2d])
-      plot!(p, hull, alpha=0.3, color=:gray)
-    end
-  end
-
-  plot_convex_region!(p, pts_2d)
 end
 

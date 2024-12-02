@@ -1,35 +1,30 @@
 struct Knightian <: Distribution{Int} end
 
 """
-    knightian(probs::AbstractArray{U, 1}) where {U <: Real}
+    knightian(low::Integer, high::Integer)
 
-Given a vector of probabilities `probs` where `sum(probs) = 1`, sample an `Int` `i` from the set {1, 2, .., `length(probs)`} with probability `probs[i]`.
-
-
-Copied from the Categorical code. Need to change to take in labels instead of probabilities. Right now the probs do nothing~
+Represents a Knightian choice from the set {low, low + 1, ..., high-1, high}.
+Code modified from `uniform_discrete.jl`.
 """
 const knightian = Knightian()
 
-function Gen.logpdf(::Knightian, x::Int, probs::AbstractArray{U,1}) where {U<:Real}
-  # (x > 0 && x <= length(probs)) ? log(probs[x]) : -Inf
+function Gen.logpdf(::Knightian, x::Int, low::Integer, high::Integer)
   return 0.0
 end
 
-# function Gen.logpdf_grad(::Knightian, x::Int, probs::AbstractArray{U,1}) where {U<:Real}
-#   grad = zeros(length(probs))
-#   grad[x] = 1.0 / probs[x]
-#   (nothing, grad)
-# end
+# TODO I'm not sure if any of the grad functions need to change.
+function Gen.logpdf_grad(::Knightian, x::Int, lower::Integer, high::Integer)
+  (nothing, nothing, nothing)
+end
 
-function Gen.random(::Knightian, probs::AbstractArray{U,1}) where {U<:Real}
-  @assert false "This should not be run!"
-  # rand(Distributions.Knightian(probs))
+function Gen.random(::Knightian, low::Integer, high::Integer)
+  @assert false "You cannot sample from the Knightian distribution!"
 end
 Gen.is_discrete(::Knightian) = true
 
-(::Knightian)(probs) = random(Knightian(), probs)
+(::Knightian)(low, high) = Gen.random(Knightian(), low, high)
 
-# Gen.has_output_grad(::Knightian) = false
-# Gen.has_argument_grads(::Knightian) = (true,)
+Gen.has_output_grad(::Knightian) = false
+Gen.has_argument_grads(::Knightian) = (false, false)
 
 export knightian

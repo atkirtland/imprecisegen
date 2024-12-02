@@ -1,22 +1,22 @@
 using Gen
 
-include("knightian.jl")
-include("lib.jl")
-include("imprecise-enumerative.jl")
-include("visualize.jl")
+include("../knightian.jl")
+include("../lib.jl")
+include("../imprecise-enumerative.jl")
+include("../visualize.jl")
 
 @gen function onea()
-  z ~ categorical([0.5, 0.5])
-  if z == 2
-    x ~ categorical([0.5, 0.5])
-    if x == 2
+  z ~ labeled_uniform([false, true])
+  if z
+    x ~ labeled_uniform([false, true])
+    if x
       return 'r'
     else
       return 'g'
     end
   else
-    y ~ categorical([0.5, 0.5])
-    if y == 2
+    y ~ labeled_uniform([false, true])
+    if y
       return 'r'
     else
       return 'b'
@@ -25,17 +25,17 @@ include("visualize.jl")
 end
 
 @gen function oneb()
-  z ~ categorical([0.5, 0.5])
-  if z == 2
-    x = {:a1} ~ knightian([0.5, 0.5])
-    if x == 2
+  z ~ labeled_uniform([false, true])
+  if z
+    x = {:a1} ~ knight([false, true])
+    if x
       return 'r'
     else
       return 'g'
     end
   else
-    y = {:a1} ~ knightian([0.5, 0.5])
-    if y == 2
+    y = {:a1} ~ knight([false, true])
+    if y
       return 'r'
     else
       return 'b'
@@ -44,17 +44,17 @@ end
 end
 
 @gen function onec()
-  z ~ categorical([0.5, 0.5])
-  if z == 2
-    x = {:a1} ~ knightian([0.5, 0.5])
-    if x == 2
+  z ~ labeled_uniform([false, true])
+  if z
+    x = {:a1} ~ knight([false, true])
+    if x
       return 'r'
     else
       return 'g'
     end
   else
-    y = {:a2} ~ knightian([0.5, 0.5])
-    if y == 2
+    y = {:a2} ~ knight([false, true])
+    if y
       return 'r'
     else
       return 'b'
@@ -72,9 +72,9 @@ model_args = ()
 # observations = choicemap(:return => 'r')
 observations = EmptyChoiceMap()
 sample_choices = [
-  (:z, [1, 2]),
-  (:x, [1, 2]),
-  (:y, [1, 2]),
+  (:z, [false, true]),
+  (:x, [false, true]),
+  (:y, [false, true]),
 ]
 sample_choice_vol_iter = choice_vol_grid(sample_choices...)
 knight_choices = [
@@ -100,11 +100,11 @@ model_args = ()
 # observations = choicemap(:return => 'r')
 observations = EmptyChoiceMap()
 sample_choices = [
-  (:z, [1, 2]),
+  (:z, [false, true]),
 ]
 sample_choice_vol_iter = choice_vol_grid(sample_choices...)
 knight_choices = [
-  (:a1, [1, 2]),
+  (:a1, [false, true]),
 ]
 knight_choice_vol_iter = choice_vol_grid(knight_choices...)
 
@@ -125,8 +125,8 @@ plot_ternary(ps[2], pts)
 model = onec
 
 knight_choices = [
-  (:a1, [1, 2]),
-  (:a2, [1, 2]),
+  (:a1, [false, true]),
+  (:a2, [false, true]),
 ]
 knight_choice_vol_iter = choice_vol_grid(knight_choices...)
 
@@ -146,3 +146,4 @@ plot_ternary(ps[3], pts)
 
 final_plot = plot(ps...)
 savefig(final_plot, "jlcss.svg")
+display(final_plot)

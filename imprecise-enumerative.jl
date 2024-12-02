@@ -68,10 +68,10 @@ function imprecise_enumerative_inference(
   end
 
   if knightEmpty
-    knight_choice_vol_iter = [(EmptyChoiceMap(),0.0)]
+    knight_choice_vol_iter = [(EmptyChoiceMap(), 0.0)]
   end
   if sampleEmpty
-    sample_choice_vol_iter = [(EmptyChoiceMap(),0.0)]
+    sample_choice_vol_iter = [(EmptyChoiceMap(), 0.0)]
   end
 
   for (i, (knight_choices, log_vol)) in enumerate(knight_choice_vol_iter)
