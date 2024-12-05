@@ -27,11 +27,18 @@ end
   return guess1
 end
 
+# Example showing a more complicated halfspace selection with `guess`
 @gen function pa8090()
-  guess1 ~ guess(['r', 'g', 'b'], x -> x == 'r', Dict(('r','g') => 0.9,('r','b') => 0.8), <=)
-  return guess1
+  x ~ bernoulli(0.5)
+  if x
+    g = {:guess1} ~ guess(['r', 'g', 'b'], x -> x == 'r', Dict(('r', 'g') => 0.9, ('r', 'b') => 0.8), <=)
+  else
+    g = {:guess1} ~ guess(['r', 'g', 'b'], x -> x == 'r', Dict(('r', 'g') => 0.9, ('r', 'b') => 0.5), <=)
+  end
+  return g
 end
 
+# Previous version was equivalent to:
 # @gen function pa8090()
 #   guess1 ~ guess(['r', 'g', 'b'], x -> x != 'r', Dict(('g','r') => 0.9, ('b','r') => 0.8), >=)
 #   return guess1
@@ -47,7 +54,7 @@ end
 
 
 
-titles = ["P(A)=0.9", "P(A)>=0.9", "P(A) 80/90","2 of three"]
+titles = ["P(A)=0.9", "P(A)>=0.9", "P(A) 80/90", "2 of three"]
 ps = [plot(framestyle=:none, aspect_ratio=1, xlims=(-0.1, 1.1), ylims=(-0.1, sqrt(3) / 2 + 0.1), title=titles[i]) for i in 1:4]
 
 # P(A)=0.9
@@ -84,7 +91,7 @@ sample_choices = [
 ]
 sample_choice_vol_iter = choice_vol_grid(sample_choices...)
 knight_choices = [
-  ((:guess1 => :z), [('r','r'), ('r', 'g'), ('r', 'b')]),
+  ((:guess1 => :z), [('r', 'r'), ('r', 'g'), ('r', 'b')]),
 ]
 knight_choice_vol_iter = choice_vol_grid(knight_choices...)
 trace_dict, log_norm_weights, lml_est = imprecise_enumerative_inference(
@@ -104,12 +111,14 @@ model = pa8090
 model_args = ()
 observations = EmptyChoiceMap()
 sample_choices = [
+  (:x, [false, true]),
   ((:guess1 => :b), [false, true]),
+  # ((:guess2 => :b), [false, true]),
 ]
 sample_choice_vol_iter = choice_vol_grid(sample_choices...)
 knight_choices = [
-  ((:guess1 => :z), [('g','g'), ('b', 'b'), ('g','r'), ('b', 'r')]),
-  # ((:guess1 => :z), [('r','r'), ('r', 'g'), ('r', 'b')]),
+  ((:guess1 => :z), [('g', 'g'), ('b', 'b'), ('g', 'r'), ('b', 'r')]),
+  # ((:guess2 => :z), [('g','g'), ('b', 'b'), ('g','r'), ('b', 'r')]),
 ]
 knight_choice_vol_iter = choice_vol_grid(knight_choices...)
 trace_dict, log_norm_weights, lml_est = imprecise_enumerative_inference(

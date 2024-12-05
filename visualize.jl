@@ -8,7 +8,7 @@ function ternary_to_cartesian(r, g, b)
   return (x, y)
 end
 
-function plot_ternary(p, pts_3d::Vector{Any})
+function plot_ternary(p, pts_3d::Vector{Any}, debug=false)
 
   tri_vertices_3d = [
     [1, 0, 0],
@@ -59,6 +59,13 @@ function plot_ternary(p, pts_3d::Vector{Any})
     marker=:circle,
     markersize=4
   )
+
+  if debug
+    for (pt_3d, pt_2d) in zip(pts_3d, pts_2d)
+      coord_label = "($(round(pt_3d[1], digits=2)), $(round(pt_3d[2], digits=2)), $(round(pt_3d[3], digits=2)))"
+      annotate!(p, pt_2d[1], pt_2d[2], text(coord_label, 6, :black))  # Change font size to 6
+    end
+  end
 
   corner_labels = [
     (0, 0, "g"),

@@ -7,6 +7,11 @@ using IterTools
 
 # https://github.com/probcomp/Gen.jl/pull/513
 @dist labeled_uniform(items) = items[uniform_discrete(1, length(items))]
+# https://www.gen.dev/docs/v0.3/ref/distributions/
+@dist function labeled_cat(labels, probs)
+  index = categorical(probs)
+  labels[index]
+end
 @dist knight(items) = items[knightian(1, length(items))]
 
 function enumerate_outcomes(traces, log_norm_weights)
@@ -59,10 +64,10 @@ end
 
 # probs must either be a Float64 or a Dict with key something true under the filter_condition
 @gen function guess(possibilities, filter_condition, probs, op::Function)
-  @assert op in [==,>=,<=] "Operation not supported!"
+  @assert op in [==, >=, <=] "Operation not supported!"
   if typeof(probs) == Float64
     # Interpret this as specifying a region around each above vertex
-    probs = Dict{Any, Float64}(() => probs)
+    probs = Dict{Any,Float64}(() => probs)
   end
   above, below = partition_by_condition(filter_condition, possibilities)
   if op == (<=)
