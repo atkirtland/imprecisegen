@@ -218,5 +218,5 @@ plot_ternary(ps[4], pts)
 # combine
 
 final_plot = plot(ps...)
-savefig(final_plot, "jlcss.svg")
+savefig(final_plot, "cip.svg")
 display(final_plot)
